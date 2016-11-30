@@ -1,0 +1,387 @@
+<alfresco-config>
+	<!--Form config for dwf:startTask rendering -->
+	<config evaluator="string-compare" condition="activiti$dynProcess">
+		<forms>
+			<form>
+				<!--List of fields to render -->
+				<field-visibility>
+					<show id="bpm:workflowDescription" />
+					<show id="bpm:workflowDueDate" />
+					<show id="bpm:assignee" />
+					<show id="dwf:assignees" />
+					<show id="dwf:description" />
+					<show id="packageItems" />
+					<show id="dwf:taskType" />
+					<show id="dwf:notification"/>
+				</field-visibility>
+				<!--Fields appearance configuration -->
+				<appearance>
+					<!--Sets definition -->
+					<set id="task-info" appearance="title" template="/org/alfresco/components/form/2-column-set.ftl"/>
+					<set id="documents" appearance="title" />
+					<set id="options" appearance="title" />
+					<!--Fields -->
+					<field id="bpm:workflowDescription" label-id="label.title" set="task-info" mandatory="true" help="">
+						<control template="/org/alfresco/components/form/controls/textfield.ftl">
+							<control-param name="style">width: 98%</control-param>
+						</control>
+					</field>
+					<field id="bpm:workflowDueDate" label-id="alvex.workflow.task-due-date" set="task-info" />
+					<field id="bpm:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
+						<control template="/orgchart-picker.ftl" />
+					</field>
+					<field id="dwf:assignees" label-id="alvex.workflow.bpm_assignees" set="task-info">
+						<control template="/orgchart-picker.ftl" />
+					</field>
+					<field id="dwf:description" label-id="label.description" set="documents">
+						<control template="/org/alfresco/components/form/controls/textarea.ftl">
+							<control-param name="style">width: 98%</control-param>
+						</control>
+					</field>
+					<field id="packageItems" label-id="alvex.workflow.related-documents" set="documents">
+						<control template="/alvex-uploader.ftl">
+							<control-param name="uploadDirectory">uploads</control-param>
+							<control-param name="createUploadDirectory">true</control-param>
+						</control>
+					</field>
+					<field id="dwf:notification" set="options" help-id="prop.dwf_notification" label-id="workflow.field.dwf_notification">
+               			<control template="/org/alfresco/components/form/controls/checkbox.ftl" />
+               	   </field>
+					<field id="dwf:taskType" label-id="alvex.workflow.dwf_taskType" set="documents" />
+				</appearance>
+			</form>
+		</forms>
+	</config>
+
+	<!--Form config to display workflow info -->
+<!--      <config evaluator="task-type" condition="dwf:submitTask">
+		<forms>
+			<form>
+				<field-visibility>
+					<show id="bpm:workflowDescription" />
+					<show id="bpm:workflowDueDate" />
+					<show id="bpm:assignee" />
+					<show id="dwf:assignees" />
+					<show id="dwf:description" />
+					<show id="packageItems" />
+					<show id="dwf:taskType" />
+				</field-visibility>
+				<appearance>
+					<set id="task-info" appearance="" template="/org/alfresco/components/form/2-column-set.ftl"/>
+					<set id="documents" appearance="" />
+					<set id="options" appearance="" />
+					<field id="bpm:workflowDescription" label-id="label.title" set="task-info" mandatory="true" help="">
+						<control template="/org/alfresco/components/form/controls/textfield.ftl">
+							<control-param name="style">width: 98%</control-param>
+						</control>
+					</field>
+					<field id="bpm:workflowDueDate" label-id="alvex.workflow.task-due-date" set="task-info" />
+					<field id="bpm:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
+						<control template="/orgchart-picker.ftl" />
+					</field>
+					<field id="dwf:assignees" label-id="alvex.workflow.bpm_assignees" set="task-info">
+						<control template="/orgchart-picker.ftl" />
+					</field>
+					<field id="dwf:description" label-id="label.description" set="documents">
+						<control template="/org/alfresco/components/form/controls/textarea.ftl">
+							<control-param name="style">width: 98%</control-param>
+						</control>
+					</field>
+					<field id="packageItems" label-id="alvex.workflow.related-documents" set="documents">
+						<control template="/alvex-uploader.ftl">
+							<control-param name="uploadDirectory">uploads</control-param>
+							<control-param name="createUploadDirectory">true</control-param>
+						</control>
+					</field>
+					<field id="dwf:taskType" label-id="alvex.workflow.dwf_taskType" set="documents" />
+				</appearance>
+			</form>
+		</forms>
+	</config> -->
+	<!--Form config to display dwf:approveTask info -->
+	<config evaluator="task-type" condition="dwf:approveTask">
+		<forms>
+			<form>
+				<!--List of fields to render -->
+				<field-visibility>
+					<show id="bpm:workflowDescription" />
+					<show id="bpm:workflowDueDate" />
+					<show id="bpm:assignee" />
+					<show id="dwf:assignees" />
+					<show id="dwf:description" />
+					<show id="packageItems" />
+					<show id="dwf:taskType" />
+					<show id="dwf:approveTaskOutcome"/>
+				</field-visibility>
+				<!--Fields appearance configuration -->
+				<appearance>
+					<!--Sets definition -->
+					<set id="task-info" appearance="" template="/org/alfresco/components/form/2-column-set.ftl"/>
+					<set id="documents" appearance="" />
+					<set id="options" appearance="" />
+					<set id="response" appearance="" />
+					<!--Fields -->
+					<field id="bpm:workflowDescription" label-id="label.title" set="task-info" mandatory="true" help="">
+						<control template="/org/alfresco/components/form/controls/textfield.ftl">
+							<control-param name="style">width: 98%</control-param>
+						</control>
+					</field>
+					<field id="bpm:workflowDueDate" label-id="alvex.workflow.task-due-date" set="task-info" />
+					<field id="bpm:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
+						<control template="/orgchart-picker.ftl" />
+					</field>
+					<field id="dwf:assignees" label-id="alvex.workflow.bpm_assignees" set="task-info">
+						<control template="/orgchart-picker.ftl" />
+					</field>
+					<field id="dwf:description" label-id="label.description" set="documents">
+						<control template="/org/alfresco/components/form/controls/textarea.ftl">
+							<control-param name="style">width: 98%</control-param>
+						</control>
+					</field>
+					<field id="packageItems" label-id="alvex.workflow.related-documents" set="documents">
+						<control template="/alvex-uploader.ftl">
+							<control-param name="uploadDirectory">uploads</control-param>
+							<control-param name="createUploadDirectory">true</control-param>
+						</control>
+					</field>
+					<field id="dwf:taskType" label-id="alvex.workflow.dwf_taskType" set="documents" />
+					<field id="dwf:approveTaskOutcome" set="response" >
+		        		<control template="/org/alfresco/components/form/controls/workflow/activiti-transitions.ftl" />
+		        	</field>
+				</appearance>
+			</form>
+		</forms>
+	</config>
+	
+	<!--Form config to display dwf:approveTask info -->
+	<config evaluator="task-type" condition="dwf:assistTask">
+		<forms>
+			<form>
+				<field-visibility>
+					<show id="dwf:description" />
+					<show id="packageItems" />
+					<show id="dwf:assistOutcome" />
+				</field-visibility>
+				<appearance>
+					<set id="documents" appearance="" />
+					<set id="response" appearance=""/>
+					<field id="dwf:description" label-id="label.description" set="documents">
+						<control template="/org/alfresco/components/form/controls/textarea.ftl">
+							<control-param name="style">width: 98%</control-param>
+						</control>
+					</field>
+					<field id="packageItems" label-id="alvex.workflow.related-documents" set="documents">
+						<control template="/alvex-uploader.ftl">
+							<control-param name="uploadDirectory">uploads</control-param>
+							<control-param name="createUploadDirectory">true</control-param>
+						</control>
+					</field>
+					<field id="dwf:assistOutcome" set="response">
+						<control template="/org/alfresco/components/form/controls/workflow/activiti-transitions.ftl" />
+					</field>
+				</appearance>
+			</form>
+		</forms>
+	</config>
+	
+	<!--Form config to display dwf:reviewTask info -->
+	<config evaluator="task-type" condition="dwf:reviewTask">
+		<forms>
+			<form>
+				<!--List of fields to render -->
+				<field-visibility>
+					<show id="bpm:workflowDescription" />
+					<show id="bpm:workflowDueDate" />
+					<show id="bpm:assignee" />
+					<show id="dwf:assignees" />
+					<show id="dwf:description" />
+					<show id="packageItems" />
+					<show id="dwf:taskType" />
+					<show id="dwf:reviewOutcome"/>
+				</field-visibility>
+				<!--Fields appearance configuration -->
+				<appearance>
+					<!--Sets definition -->
+					<set id="task-info" appearance="" template="/org/alfresco/components/form/2-column-set.ftl"/>
+					<set id="documents" appearance="" />
+					<set id="options" appearance="" />
+					<set id="response" appearance="" />
+					<!--Fields -->
+					<field id="bpm:workflowDescription" label-id="label.title" set="task-info" mandatory="true" help="">
+						<control template="/org/alfresco/components/form/controls/textfield.ftl">
+							<control-param name="style">width: 98%</control-param>
+						</control>
+					</field>
+					<field id="bpm:workflowDueDate" label-id="alvex.workflow.task-due-date" set="task-info" />
+					<field id="bpm:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
+						<control template="/orgchart-picker.ftl" />
+					</field>
+					<field id="dwf:assignees" label-id="alvex.workflow.bpm_assignees" set="task-info">
+						<control template="/orgchart-picker.ftl" />
+					</field>
+					<field id="dwf:description" label-id="label.description" set="documents">
+						<control template="/org/alfresco/components/form/controls/textarea.ftl">
+							<control-param name="style">width: 98%</control-param>
+						</control>
+					</field>
+					<field id="packageItems" label-id="alvex.workflow.related-documents" set="documents">
+						<control template="/alvex-uploader.ftl">
+							<control-param name="uploadDirectory">uploads</control-param>
+							<control-param name="createUploadDirectory">true</control-param>
+						</control>
+					</field>
+					<field id="dwf:taskType" label-id="alvex.workflow.dwf_taskType" set="documents" />
+					<field id="dwf:reviewOutcome" set="response" >
+		        		<control template="/org/alfresco/components/form/controls/workflow/activiti-transitions.ftl" />
+		        	</field>
+				</appearance>
+			</form>
+		</forms>
+	</config>
+	
+	<!--Form config to display dwf:archiveTask info -->
+	<config evaluator="task-type" condition="dwf:archiveTask">
+		<forms>
+			<form>
+				<!--List of fields to render -->
+				<field-visibility>
+					<show id="bpm:workflowDescription" />
+					<show id="bpm:workflowDueDate" />
+					<show id="bpm:assignee" />
+					<show id="dwf:assignees" />
+					<show id="dwf:description" />
+					<show id="packageItems" />
+					<show id="dwf:taskType" />
+					<show id="dwf:archiveOutcome"/>
+				</field-visibility>
+				<!--Fields appearance configuration -->
+				<appearance>
+					<!--Sets definition -->
+					<set id="task-info" appearance="" template="/org/alfresco/components/form/2-column-set.ftl"/>
+					<set id="documents" appearance="" />
+					<set id="options" appearance="" />
+					<set id="response" appearance="" />
+					<!--Fields -->
+					<field id="bpm:workflowDescription" label-id="label.title" set="task-info" mandatory="true" help="">
+						<control template="/org/alfresco/components/form/controls/textfield.ftl">
+							<control-param name="style">width: 98%</control-param>
+						</control>
+					</field>
+					<field id="bpm:workflowDueDate" label-id="alvex.workflow.task-due-date" set="task-info" />
+					<field id="bpm:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
+						<control template="/orgchart-picker.ftl" />
+					</field>
+					<field id="dwf:assignees" label-id="alvex.workflow.bpm_assignees" set="task-info">
+						<control template="/orgchart-picker.ftl" />
+					</field>
+					<field id="dwf:description" label-id="label.description" set="documents">
+						<control template="/org/alfresco/components/form/controls/textarea.ftl">
+							<control-param name="style">width: 98%</control-param>
+						</control>
+					</field>
+					<field id="packageItems" label-id="alvex.workflow.related-documents" set="documents">
+						<control template="/alvex-uploader.ftl">
+							<control-param name="uploadDirectory">uploads</control-param>
+							<control-param name="createUploadDirectory">true</control-param>
+						</control>
+					</field>
+					<field id="dwf:taskType" label-id="alvex.workflow.dwf_taskType" set="documents" />
+					<field id="dwf:archiveOutcome" set="response" >
+		        		<control template="/org/alfresco/components/form/controls/workflow/activiti-transitions.ftl" />
+		        	</field>
+				</appearance>
+			</form>
+		</forms>
+	</config>
+	
+	<!--Form config to display dwf:rejectedTask info -->
+	<config evaluator="task-type" condition="dwf:rejectedTask">
+		<forms>
+			<form>
+				<!--List of fields to render -->
+				<field-visibility>
+					<show id="bpm:workflowDescription" />
+					<show id="bpm:workflowDueDate" />
+					<show id="dwf:assignees" />
+					<show id="dwf:description" />
+					<show id="packageItems" />
+					<show id="dwf:taskType" />
+					<show id="transitions"/>
+				</field-visibility>
+				<!--Fields appearance configuration -->
+				<appearance>
+					<!--Sets definition -->
+					<set id="task-info" appearance="" template="/org/alfresco/components/form/2-column-set.ftl"/>
+					<set id="documents" appearance="" />
+					<set id="options" appearance="" />
+					<set id="response" appearance="" />
+					<!--Fields -->
+					<field id="bpm:workflowDescription" label-id="label.title" set="task-info" mandatory="true" help="">
+						<control template="/org/alfresco/components/form/controls/textfield.ftl">
+							<control-param name="style">width: 98%</control-param>
+						</control>
+					</field>
+					<field id="bpm:workflowDueDate" label-id="alvex.workflow.task-due-date" set="task-info" />
+					<field id="dwf:assignees" label-id="alvex.workflow.bpm_assignees" set="task-info">
+						<control template="/orgchart-picker.ftl" />
+					</field>
+					<field id="dwf:description" label-id="label.description" set="documents">
+						<control template="/org/alfresco/components/form/controls/textarea.ftl">
+							<control-param name="style">width: 98%</control-param>
+						</control>
+					</field>
+					<field id="packageItems" label-id="alvex.workflow.related-documents" set="documents">
+						<control template="/alvex-uploader.ftl">
+							<control-param name="uploadDirectory">uploads</control-param>
+							<control-param name="createUploadDirectory">true</control-param>
+						</control>
+					</field>
+					<field id="dwf:taskType" label-id="alvex.workflow.dwf_taskType" set="documents" />
+					<field id="transitions" set="response" ></field>
+				</appearance>
+			</form>
+		</forms>
+	</config>
+	
+	<!--Form config to display dwf:completedTask info -->
+	<config evaluator="task-type" condition="dwf:completedTask">
+		<forms>
+			<form>
+				<!--List of fields to render -->
+				<field-visibility>
+					<show id="bpm:workflowDescription" />
+					<show id="bpm:workflowDueDate" />
+					<show id="packageItems" />
+					<show id="transitions"/>
+				</field-visibility>
+				<!--Fields appearance configuration -->
+				<appearance>
+					<!--Sets definition -->
+					<set id="task-info" appearance="" template="/org/alfresco/components/form/2-column-set.ftl"/>
+					<set id="documents" appearance="" />
+					<set id="options" appearance="" />
+					<set id="response" appearance="" />
+					<!--Fields -->
+					<field id="bpm:workflowDescription" label-id="label.title" set="task-info" mandatory="true" help="">
+						<control template="/org/alfresco/components/form/controls/textfield.ftl">
+							<control-param name="style">width: 98%</control-param>
+						</control>
+					</field>
+					<field id="bpm:workflowDueDate" label-id="alvex.workflow.task-due-date" set="task-info" />
+					<field id="bpm:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
+						<control template="/orgchart-picker.ftl" />
+					</field>
+					<field id="packageItems" label-id="alvex.workflow.related-documents" set="documents">
+						<control template="/alvex-uploader.ftl">
+							<control-param name="uploadDirectory">uploads</control-param>
+							<control-param name="createUploadDirectory">true</control-param>
+						</control>
+					</field>
+					<field id="transitions" set="response" ></field>
+				</appearance>
+			</form>
+		</forms>
+	</config>
+	
+	
+</alfresco-config>

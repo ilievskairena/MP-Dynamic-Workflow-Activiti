@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Definition of new Model -->
+<model name="dwf:dynamicworkflowmodel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+	<!-- Optional meta-data about the model -->
+	<description>Dynamic process</description>
+	<author>Irena Ilievska</author>
+	<version>1.0</version>
+
+	<!-- Imports are required to allow references to definitions in other models -->
+	<imports>
+		<!-- Import Alfresco Dictionary Definitions -->
+		<import uri="http://www.alfresco.org/model/dictionary/1.0"
+			prefix="d" />
+		<!-- Import Alfresco Content Domain Model Definitions -->
+		<import uri="http://www.alfresco.org/model/system/1.0" prefix="sys" />
+		<import uri="http://www.alfresco.org/model/bpm/1.0" prefix="bpm" />
+		<import uri="http://www.alfresco.org/model/content/1.0" prefix="cm" />
+		<import uri="http://www.alfresco.org/model/workflow/1.0"
+			prefix="wf" />
+	</imports>
+
+	<!-- Introduction of new namespaces defined by this model -->
+	<namespaces>
+		<namespace uri="http://www.dynModel.com/model/workflow/1.0"
+			prefix="dwf" />
+	</namespaces>
+	<constraints>
+		<constraint name="dwf:percentConstraint" type="MINMAX">
+	           <parameter name="minValue"><value>1</value></parameter>
+	           <parameter name="maxValue"><value>100</value></parameter>
+	    </constraint>
+	    
+	    
+		<constraint name="dwf:typeConstraint" type="LIST">
+			<parameter name="allowedValues">
+				<list>
+					<value>Select_Option</value>
+					<value>Approval</value>
+					<value>Review</value>
+					<value>Archive</value>
+					<value>Finished</value>
+				</list>
+			</parameter>
+		</constraint>
+	</constraints>
+	
+	<types>
+		<type name="dwf:submitTask">
+			<title>Task</title>
+			<parent>bpm:startTask</parent>
+			<mandatory-aspects>
+				<aspect>bpm:assignee</aspect>
+				<aspect>dwf:assignees</aspect>
+				<aspect>dwf:taskDetails</aspect>
+				<aspect>dwf:taskType</aspect>
+				<aspect>dwf:notification</aspect>
+			</mandatory-aspects>
+		</type>
+
+		<type name="dwf:approveTask">
+			<title>Approval</title>
+			<parent>bpm:activitiOutcomeTask</parent>
+			<properties>
+				<property name="dwf:approveTaskOutcome">
+					<type>d:text</type>
+					<default>Reject</default>
+					<constraints>
+						<constraint name="dwf:approveTaskOutcomeOptions" type="LIST">
+							<parameter name="allowedValues">
+								<list>
+									<value>Approve</value>
+									<value>Reject</value>
+									<value>Finish</value>
+								</list>
+							</parameter>
+						</constraint>
+					</constraints>
+				</property>
+			</properties>
+			<overrides>
+				<property name="bpm:outcomePropertyName">
+					<default>{http://www.dynModel.com/model/workflow/1.0}approveTaskOutcome</default>
+				</property>
+				<property name="bpm:packageActionGroup">
+					<default>add_package_item_actions</default>
+				</property>
+				<property name="bpm:packageItemActionGroup">
+					<default>edit_and_remove_package_item_actions</default>
+				</property>
+			</overrides>
+			<mandatory-aspects>
+				<aspect>bpm:assignee</aspect>
+				<aspect>dwf:assignees</aspect>
+				<aspect>dwf:taskDetails</aspect>
+				<aspect>dwf:taskType</aspect>
+	         </mandatory-aspects>
+		</type>  
+		
+		<type name="dwf:reviewTask">
+			<title>Review</title>
+			<parent>bpm:activitiOutcomeTask</parent>
+			<properties>
+				<property name="dwf:reviewOutcome">
+					<type>d:text</type>
+					<default>Done</default>
+					<constraints>
+						<constraint name="dwf:reviewOutcomeOptions" type="LIST">
+							<parameter name="allowedValues">
+								<list>
+									<value>Done</value>
+									<value>Finish</value>
+								</list>
+							</parameter>
+						</constraint>
+					</constraints>
+				</property>
+			</properties>
+			<overrides>
+				<property name="bpm:outcomePropertyName">
+					<default>{http://www.dynModel.com/model/workflow/1.0}reviewOutcome</default>
+				</property>
+				<property name="bpm:packageActionGroup">
+					<default>add_package_item_actions</default>
+				</property>
+				<property name="bpm:packageItemActionGroup">
+					<default>edit_and_remove_package_item_actions</default>
+				</property>
+			</overrides>
+			<mandatory-aspects>
+				<aspect>bpm:assignee</aspect>
+				<aspect>dwf:assignees</aspect>
+				<aspect>dwf:taskDetails</aspect>
+				<aspect>dwf:taskType</aspect>
+	         </mandatory-aspects>
+		</type> 
+		
+		<type name="dwf:archiveTask">
+			<title>Archive</title>
+			<parent>bpm:activitiOutcomeTask</parent>
+			<properties>
+				<property name="dwf:archiveOutcome">
+					<type>d:text</type>
+					<default>Rejected</default>
+					<constraints>
+						<constraint name="dwf:archiveOutcomeOptions" type="LIST">
+							<parameter name="allowedValues">
+								<list>
+									<value>Archive</value>
+									<value>Reject</value>
+									<value>Finish</value>
+								</list>
+							</parameter>
+						</constraint>
+					</constraints>
+				</property>
+			</properties>
+			<overrides>
+				<property name="bpm:outcomePropertyName">
+					<default>{http://www.dynModel.com/model/workflow/1.0}archiveOutcome</default>
+				</property>
+				<property name="bpm:packageActionGroup">
+					<default>add_package_item_actions</default>
+				</property>
+				<property name="bpm:packageItemActionGroup">
+					<default>edit_and_remove_package_item_actions</default>
+				</property>
+			</overrides>
+			 <mandatory-aspects>
+			 	<aspect>bpm:assignee</aspect>
+				<aspect>dwf:assignees</aspect>
+				<aspect>dwf:taskDetails</aspect>
+				<aspect>dwf:taskType</aspect>
+	         </mandatory-aspects>
+		</type>  
+		
+		<type name="dwf:rejectedTask">
+			<title>Task Rejected</title>
+			<parent>bpm:workflowTask</parent>
+			<mandatory-aspects>
+				<aspect>dwf:assignees</aspect>
+				<aspect>dwf:taskDetails</aspect>
+				<aspect>dwf:taskType</aspect>
+			</mandatory-aspects>
+		</type>
+		
+		<type name="dwf:assistTask">
+			<title>Assist task</title>
+			<parent>bpm:activitiOutcomeTask</parent>
+			<properties>
+				<property name="dwf:assistOutcome">
+					<type>d:text</type>
+					<default>Done</default>
+					<constraints>
+						<constraint name="dwf:assistOutcomeOptions" type="LIST">
+							<parameter name="allowedValues">
+								<list>
+									<value>Done</value>
+								</list>
+							</parameter>
+						</constraint>
+					</constraints>
+				</property>
+			</properties>
+			<overrides>
+				<property name="bpm:outcomePropertyName">
+					<default>{http://www.dynModel.com/model/workflow/1.0}assistOutcome</default>
+				</property>
+				<property name="bpm:packageActionGroup">
+					<default>add_package_item_actions</default>
+				</property>
+				<property name="bpm:packageItemActionGroup">
+					<default>edit_and_remove_package_item_actions</default>
+				</property>
+			</overrides>
+			<mandatory-aspects>
+				<aspect>dwf:taskDetails</aspect>
+			</mandatory-aspects>
+		</type>
+		
+		<type name="dwf:completedTask">
+			<title>Task Completed</title>
+			<parent>bpm:workflowTask</parent>
+		</type>
+		
+ 	</types>
+ 	
+ 	<aspects>	
+	
+		<aspect name="dwf:requiredApprovePercent">
+        	<properties>
+	            <property name="dwf:requiredApprovePercent">
+	                <type>d:int</type>
+	                <mandatory>true</mandatory>
+	                <default>50</default>
+	                <constraints>
+	                    <constraint ref="dwf:percentConstraint"/>
+	                </constraints>
+	            </property>
+         	</properties>
+        </aspect>
+        
+		<aspect name="dwf:assignees">
+			<associations>
+				<association name="dwf:assignees">
+					<source>
+						<mandatory>false</mandatory>
+						<many>false</many>
+					</source>
+					<target>
+						<class>cm:person</class>
+						<mandatory>false</mandatory>
+						<many>true</many>
+					</target>
+				</association>
+			</associations>
+		</aspect>
+		
+		<aspect name="dwf:assistAssignees">
+			<associations>
+				<association name="dwf:assistAssignees">
+					<source>
+						<mandatory>false</mandatory>
+						<many>false</many>
+					</source>
+					<target>
+						<class>cm:person</class>
+						<mandatory>false</mandatory>
+						<many>true</many>
+					</target>
+				</association>
+			</associations>
+		</aspect>
+		
+		<aspect name="dwf:taskDetails">
+			<properties>
+				<property name="dwf:description">
+					<type>d:text</type>
+				</property>
+			</properties>
+		</aspect>
+		<aspect name="dwf:taskType">
+			<properties>
+	            <property name="dwf:taskType">
+	                <type>d:text</type>
+	                <mandatory>true</mandatory>
+	                <default>Select_Option</default>
+	                <constraints>
+	                    <constraint ref="dwf:typeConstraint"/>
+	                </constraints>
+	            </property>
+         	</properties>
+		</aspect>
+		<aspect name="dwf:notification">
+			<properties>
+				<property name="dwf:notification">
+					<type>d:boolean</type>			
+					<default>true</default>		
+				</property>
+			</properties>
+		</aspect>
+	</aspects>
+</model>
