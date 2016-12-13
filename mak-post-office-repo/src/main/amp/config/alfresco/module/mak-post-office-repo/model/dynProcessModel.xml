@@ -49,7 +49,7 @@
 			<title>Task</title>
 			<parent>bpm:startTask</parent>
 			<mandatory-aspects>
-				<aspect>bpm:assignee</aspect>
+				<aspect>dwf:assignee</aspect>
 				<aspect>dwf:assignees</aspect>
 				<aspect>dwf:taskDetails</aspect>
 				<aspect>dwf:taskType</aspect>
@@ -70,7 +70,6 @@
 								<list>
 									<value>Approve</value>
 									<value>Reject</value>
-									<value>Finish</value>
 								</list>
 							</parameter>
 						</constraint>
@@ -89,7 +88,7 @@
 				</property>
 			</overrides>
 			<mandatory-aspects>
-				<aspect>bpm:assignee</aspect>
+				<aspect>dwf:assignee</aspect>
 				<aspect>dwf:assignees</aspect>
 				<aspect>dwf:taskDetails</aspect>
 				<aspect>dwf:taskType</aspect>
@@ -108,7 +107,6 @@
 							<parameter name="allowedValues">
 								<list>
 									<value>Done</value>
-									<value>Finish</value>
 								</list>
 							</parameter>
 						</constraint>
@@ -127,7 +125,7 @@
 				</property>
 			</overrides>
 			<mandatory-aspects>
-				<aspect>bpm:assignee</aspect>
+				<aspect>dwf:assignee</aspect>
 				<aspect>dwf:assignees</aspect>
 				<aspect>dwf:taskDetails</aspect>
 				<aspect>dwf:taskType</aspect>
@@ -147,7 +145,6 @@
 								<list>
 									<value>Archive</value>
 									<value>Reject</value>
-									<value>Finish</value>
 								</list>
 							</parameter>
 						</constraint>
@@ -166,7 +163,7 @@
 				</property>
 			</overrides>
 			 <mandatory-aspects>
-			 	<aspect>bpm:assignee</aspect>
+			 	<aspect>dwf:assignee</aspect>
 				<aspect>dwf:assignees</aspect>
 				<aspect>dwf:taskDetails</aspect>
 				<aspect>dwf:taskType</aspect>
@@ -238,6 +235,22 @@
 	            </property>
          	</properties>
         </aspect>
+        
+        <aspect name="dwf:assignee">
+			<associations>
+				<association name="dwf:assignee">
+					<source>
+						<mandatory>false</mandatory>
+						<many>false</many>
+					</source>
+					<target>
+						<class>cm:person</class>
+						<mandatory>false</mandatory>
+						<many>false</many>
+					</target>
+				</association>
+			</associations>
+		</aspect>
         
 		<aspect name="dwf:assignees">
 			<associations>

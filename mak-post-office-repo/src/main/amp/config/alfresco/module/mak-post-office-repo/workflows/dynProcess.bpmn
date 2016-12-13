@@ -5,8 +5,14 @@
       <activiti:executionListener event="start" class="org.alfresco.repo.workflow.activiti.listener.ScriptExecutionListener">
         <activiti:field name="script">
           <activiti:string><![CDATA[<import resource="classpath:alfresco/extension/workflow/throwCustomErrors.js">
-          		if(execution.getVariable('dwf_taskType')== 'Select_Option'){
-	            	illegalDataErrors(1);
+	            if(typeof dwf_assignee== 'undefined'){
+	            	illegalDataErrors(2);
+	            }
+	            if(execution.getVariable('dwf_taskType')== 'Select_Option'){
+	            	illegalDataErrors(4);
+	            }
+	            if(execution.getVariable('dwf_taskType')== 'Finished'){
+	            	illegalDataErrors(3);
 	            }
           		execution.setVariable('bpm_package', bpm_package);
 	            execution.setVariable('bpm_sendEMailNotifications', bpm_sendEMailNotifications);
@@ -15,11 +21,15 @@
 	            execution.setVariable('approveRejected', 'false');
 	            execution.setVariable('archiveRejected', 'false');
 		        execution.setVariable('bpm_workflowDescription', dwf_description);
-	            execution.setVariable('bpm_assignee',bpm_assignee);
-	            if(typeof dwf_assignees!= 'undefined')
+	            execution.setVariable('dwf_assignee',dwf_assignee);
+	            if(typeof dwf_assignees!= 'undefined'){
 	            	execution.setVariable('dwf_assistAssignees',dwf_assignees);
-		        else 
+	            	execution.setVariable('assistFlow','true');
+	            	}
+		        else {
 		        	execution.setVariable('dwf_assistAssignees','');
+		        	execution.setVariable('assistFlow','false');
+		        	}
 	            if(dwf_notification == 'true'){
 	            	execution.setVariable('notification', 'true');
 	            }
@@ -31,35 +41,12 @@
       </activiti:executionListener>
     </extensionElements>
     <startEvent id="start" name="Start" activiti:formKey="dwf:submitTask"></startEvent>
-    <exclusiveGateway id="gate1" name="Gate 1">
-      <extensionElements>
-        <activiti:executionListener event="start" class="org.alfresco.repo.workflow.activiti.listener.ScriptExecutionListener">
-          <activiti:field name="script">
-            <activiti:string><![CDATA[logger.log("\n\n\n EXECUTION");]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-      </extensionElements>
-    </exclusiveGateway>
-    <sequenceFlow id="flow1" sourceRef="parallelgateway2" targetRef="gate1">
-      <extensionElements>
-        <activiti:executionListener event="take" class="org.alfresco.repo.workflow.activiti.listener.ScriptExecutionListener">
-          <activiti:field name="script">
-            <activiti:string><![CDATA[logger.log("\n\n\nFLOW MAIN");]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
+    <exclusiveGateway id="gate1" name="Gate 1"></exclusiveGateway>
+    <sequenceFlow id="flow1" sourceRef="parallelgateway2" targetRef="gate1"></sequenceFlow>
     <sequenceFlow id="flow2" sourceRef="gate1" targetRef="approve">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('typeTask')=='Approval'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow5" sourceRef="gate1" targetRef="review">
-      <extensionElements>
-        <activiti:executionListener event="take" class="org.alfresco.repo.workflow.activiti.listener.ScriptExecutionListener">
-          <activiti:field name="script">
-            <activiti:string><![CDATA[logger.log("\n\n\n FLOW REVIEW");]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-      </extensionElements>
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('typeTask')=='Review'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow10" sourceRef="gate1" targetRef="archive">
@@ -76,17 +63,20 @@
 			                        if (typeof bpm_comment != 'undefined') task.comment = bpm_comment;
 			                        execution.setVariable('archiveRejected','false');
 	                    			execution.setVariable('approveRejected','false');
-						execution.setVariable('bpm_assignee','');
+						execution.setVariable('dwf_assignee','');
 						execution.setVariable('dwf_assignees','');]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
         <activiti:taskListener event="complete" class="org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener">
           <activiti:field name="script">
             <activiti:string><![CDATA[<import resource="classpath:alfresco/extension/workflow/throwCustomErrors.js">
-            		if(execution.getVariable('dwf_taskType')== 'Select_Option'){
+            		if(task.getVariableLocal('dwf_taskType')== 'Select_Option'){
 	            		illegalDataErrors(1);
 	            	}
-            		execution.setVariable('bpm_assignee', task.getVariableLocal('bpm_assignee'));
+	            	if((task.getVariableLocal('dwf_assignee')== '' || task.getVariableLocal('dwf_assignee')== 'undefined' || task.getVariableLocal('dwf_assignee')== null || task.getVariableLocal('dwf_assignee')== undefined) && execution.getVariable('dwf_taskType')!= 'Finished'){
+	            		illegalDataErrors(2);
+	            	}
+            		execution.setVariable('dwf_assignee', task.getVariableLocal('dwf_assignee'));
 	            	execution.setVariable('typeTask',task.getVariableLocal('dwf_taskType'));
 					if(task.getVariableLocal('dwf_taskType') == 'Finished')
 					{
@@ -94,10 +84,15 @@
 					}
 					else
 		       			execution.setVariable('finished', 'false');
-		       		execution.setVariable('bpm_assignee',task.getVariableLocal('bpm_assignee'));
-		       		if(task.getVariableLocal('dwf_assignees')!= '' && task.getVariableLocal('dwf_assignees')!= 'undefined')
+		       		execution.setVariable('dwf_assignee',task.getVariableLocal('dwf_assignee'));
+		       		if(task.getVariableLocal('dwf_assignees')!= '' && task.getVariableLocal('dwf_assignees')!= 'undefined' && task.getVariableLocal('dwf_assignees')!= null && task.getVariableLocal('dwf_assignees')!= undefined){
 	            		execution.setVariable('dwf_assistAssignees',task.getVariableLocal('dwf_assignees'));
-	            	else execution.setVariable('dwf_assistAssignees','');	            	
+	            		execution.setVariable('assistFlow','true');
+	            		}
+	            	else {
+	            		execution.setVariable('dwf_assistAssignees','');
+	            		execution.setVariable('assistFlow','false');
+	            		}	            	
 	            	execution.setVariable('returnApprove','false');]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
@@ -136,17 +131,20 @@
 			                        if (typeof bpm_comment != 'undefined') task.comment = bpm_comment;
 			                        execution.setVariable('archiveRejected','false');
 	                    			execution.setVariable('approveRejected','false');
-						execution.setVariable('bpm_assignee','');
+						execution.setVariable('dwf_assignee','');
 						execution.setVariable('dwf_assignees','');]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
         <activiti:taskListener event="complete" class="org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener">
           <activiti:field name="script">
             <activiti:string><![CDATA[<import resource="classpath:alfresco/extension/workflow/throwCustomErrors.js">
-            		if(execution.getVariable('dwf_taskType')== 'Select_Option'){
+            		if(task.getVariableLocal('dwf_taskType')== 'Select_Option'){
 	            		illegalDataErrors(1);
 	            	}
-            		execution.setVariable('bpm_assignee', task.getVariableLocal('bpm_assignee'));
+	            	if((task.getVariableLocal('dwf_assignee')== '' || task.getVariableLocal('dwf_assignee')== 'undefined' || task.getVariableLocal('dwf_assignee')== null || task.getVariableLocal('dwf_assignee')== undefined) && execution.getVariable('dwf_taskType')!= 'Finished'){
+	            		illegalDataErrors(2);
+	            	}
+            		execution.setVariable('dwf_assignee', task.getVariableLocal('dwf_assignee'));
 	            	execution.setVariable('typeTask',task.getVariableLocal('dwf_taskType'));
 					if(task.getVariableLocal('dwf_taskType') == 'Finished')
 					{
@@ -154,10 +152,15 @@
 					}
 					else
 		       			execution.setVariable('finished', 'false');
-		       		execution.setVariable('bpm_assignee',task.getVariableLocal('bpm_assignee'));
-		       		if(task.getVariableLocal('dwf_assignees')!= '' && task.getVariableLocal('dwf_assignees')!= 'undefined')
+		       		execution.setVariable('dwf_assignee',task.getVariableLocal('dwf_assignee'));
+		       		if(task.getVariableLocal('dwf_assignees')!= '' && task.getVariableLocal('dwf_assignees')!= 'undefined' && task.getVariableLocal('dwf_assignees')!= null && task.getVariableLocal('dwf_assignees')!= undefined){
 	            		execution.setVariable('dwf_assistAssignees',task.getVariableLocal('dwf_assignees'));
-	            	else execution.setVariable('dwf_assistAssignees','');	            	
+	            		execution.setVariable('assistFlow','true');
+	            		}
+	            	else {
+	            		execution.setVariable('dwf_assistAssignees','');
+	            		execution.setVariable('assistFlow','false');
+	            		}            	
 	            	execution.setVariable('returnApprove','false');]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
@@ -169,7 +172,7 @@
     <sequenceFlow id="flow28" sourceRef="gate4" targetRef="gate2">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('archiveRejected')=='false'}]]></conditionExpression>
     </sequenceFlow>
-    <userTask id="approve" name="Approval" activiti:assignee="${bpm_assignee.properties.userName}" activiti:formKey="dwf:approveTask">
+    <userTask id="approve" name="Approval" activiti:assignee="${dwf_assignee.properties.userName}" activiti:formKey="dwf:approveTask">
       <extensionElements>
         <activiti:taskListener event="create" class="org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener">
           <activiti:field name="script">
@@ -178,7 +181,7 @@
 			                        if (typeof bpm_comment != 'undefined') task.comment = bpm_comment;
 			                        execution.setVariable('archiveRejected','false');
 	                    			execution.setVariable('approveRejected','false');
-						execution.setVariable('bpm_assignee','');
+						execution.setVariable('dwf_assignee','');
 						execution.setVariable('dwf_assignees','');]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
@@ -194,16 +197,24 @@ addPermissionToUser(task.assignee, "Collaborator", bpm_package,initiator.propert
         <activiti:taskListener event="complete" class="org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener">
           <activiti:field name="script">
             <activiti:string><![CDATA[<import resource="classpath:alfresco/extension/workflow/throwCustomErrors.js">
-            		if(execution.getVariable('dwf_taskType')== 'Select_Option'){
+            		if(task.getVariableLocal('dwf_taskType')== 'Select_Option'){
 	            		illegalDataErrors(1);
 	            	}
+	            	if((task.getVariableLocal('dwf_assignee')== '' || task.getVariableLocal('dwf_assignee')== 'undefined' || task.getVariableLocal('dwf_assignee')== null || task.getVariableLocal('dwf_assignee')== undefined) && (execution.getVariable('dwf_taskType')!= 'Finished' || task.getVariableLocal('dwf_approveTaskOutcome') != 'Reject')){
+	            		illegalDataErrors(2);
+	            	}
 	            	if(task.getVariableLocal('dwf_approveTaskOutcome') == 'Approve'){
-	            	execution.setVariable('bpm_assignee', task.getVariableLocal('bpm_assignee'));
+	            	execution.setVariable('dwf_assignee', task.getVariableLocal('dwf_assignee'));
 	            	execution.setVariable('typeTask',task.getVariableLocal('dwf_taskType'));
 		       		execution.setVariable('finished', 'false');
-		       		if(task.getVariableLocal('dwf_assignees')!= 'undefined' && task.getVariableLocal('dwf_assignees')!= '')
+		       		if(task.getVariableLocal('dwf_assignees')!= 'undefined' && task.getVariableLocal('dwf_assignees')!= '' && task.getVariableLocal('dwf_assignees')!= null && task.getVariableLocal('dwf_assignees')!= undefined){
 	            		execution.setVariable('dwf_assistAssignees',task.getVariableLocal('dwf_assignees'));
-	            	else execution.setVariable('dwf_assistAssignees','');	
+	            		execution.setVariable('assistFlow','true');
+	            	}
+	            	else {
+	            		execution.setVariable('dwf_assistAssignees','');
+	            		execution.setVariable('assistFlow','false');
+	            	}
 	            	if(execution.getVariable('returnApprove')== 'false'){
 	            		execution.setVariable('returnApprove','true');
 	            		execution.setVariable('returnAssignee',task.assignee);
@@ -212,9 +223,14 @@ addPermissionToUser(task.assignee, "Collaborator", bpm_package,initiator.propert
 	          else if(task.getVariableLocal('dwf_approveTaskOutcome') == 'Reject'){
 		       		execution.setVariable('finished', 'false');
                     execution.setVariable('approveRejected','true');
-                    if(task.getVariableLocal('dwf_assignees')!= 'undefined' && task.getVariableLocal('dwf_assignees')!= '')
+                    if(task.getVariableLocal('dwf_assignees')!= 'undefined' && task.getVariableLocal('dwf_assignees')!= '' && task.getVariableLocal('dwf_assignees')!= null && task.getVariableLocal('dwf_assignees')!= undefined){
 	            		execution.setVariable('dwf_assistAssignees',task.getVariableLocal('dwf_assignees'));
-	            	else execution.setVariable('dwf_assistAssignees','');
+	            		execution.setVariable('assistFlow','true');
+	            	}
+	            	else {
+	            		execution.setVariable('dwf_assistAssignees','');
+	            		execution.setVariable('assistFlow','false');
+	            	}
 	            	execution.setVariable('returnApprove','false');
 	          }
 	          
@@ -227,7 +243,7 @@ addPermissionToUser(task.assignee, "Collaborator", bpm_package,initiator.propert
         </activiti:taskListener>
       </extensionElements>
     </userTask>
-    <userTask id="review" name="Review" activiti:assignee="${bpm_assignee.properties.userName}" activiti:formKey="dwf:reviewTask">
+    <userTask id="review" name="Review" activiti:assignee="${dwf_assignee.properties.userName}" activiti:formKey="dwf:reviewTask">
       <extensionElements>
         <activiti:taskListener event="create" class="org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener">
           <activiti:field name="script">
@@ -236,7 +252,7 @@ addPermissionToUser(task.assignee, "Collaborator", bpm_package,initiator.propert
 			                        if (typeof bpm_comment != 'undefined') task.comment = bpm_comment;
 			                        execution.setVariable('archiveRejected','false');
 	                    			execution.setVariable('approveRejected','false');
-						execution.setVariable('bpm_assignee','');
+						execution.setVariable('dwf_assignee','');
 						execution.setVariable('dwf_assignees','');]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
@@ -252,17 +268,24 @@ addPermissionToUser(task.assignee, "Consumer", bpm_package,initiator.properties.
         <activiti:taskListener event="complete" class="org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener">
           <activiti:field name="script">
             <activiti:string><![CDATA[<import resource="classpath:alfresco/extension/workflow/throwCustomErrors.js">
-            		if(execution.getVariable('dwf_taskType')== 'Select_Option'){
+            		if(task.getVariableLocal('dwf_taskType')== 'Select_Option'){
 	            		illegalDataErrors(1);
 	            	}
+	            	if((task.getVariableLocal('dwf_assignee')== '' || task.getVariableLocal('dwf_assignee')== 'undefined' || task.getVariableLocal('dwf_assignee')== null || task.getVariableLocal('dwf_assignee')== undefined) && execution.getVariable('dwf_taskType')!= 'Finished'){
+	            		illegalDataErrors(2);
+	            	}
 	            	if(task.getVariableLocal('dwf_reviewOutcome') == 'Done'){
-		            	execution.setVariable('bpm_assignee', task.getVariableLocal('bpm_assignee'));
+		            	execution.setVariable('dwf_assignee', task.getVariableLocal('dwf_assignee'));
 		            	execution.setVariable('typeTask',task.getVariableLocal('dwf_taskType'));
 			       		execution.setVariable('finished', 'false');
-			       		if(task.getVariableLocal('dwf_assignees')!= 'undefined' && task.getVariableLocal('dwf_assignees')!= ''){
+			       		if(task.getVariableLocal('dwf_assignees')!= 'undefined' && task.getVariableLocal('dwf_assignees')!= '' && task.getVariableLocal('dwf_assignees')!= null && task.getVariableLocal('dwf_assignees')!= undefined){
 	            			execution.setVariable('dwf_assistAssignees',task.getVariableLocal('dwf_assignees'));
+	            			execution.setVariable('assistFlow','true');
 	            		}
-	            		else execution.setVariable('dwf_assistAssignees','');	
+	            		else {
+	            			execution.setVariable('dwf_assistAssignees','');
+	            			execution.setVariable('assistFlow','false');
+	            		}
 		            	execution.setVariable('returnApprove','false');
 		            }
 	          		if(task.getVariableLocal('dwf_taskType')=='Finished'){
@@ -274,7 +297,7 @@ addPermissionToUser(task.assignee, "Consumer", bpm_package,initiator.properties.
         </activiti:taskListener>
       </extensionElements>
     </userTask>
-    <userTask id="archive" name="Archiving" activiti:assignee="${bpm_assignee.properties.userName}" activiti:formKey="dwf:archiveTask">
+    <userTask id="archive" name="Archiving" activiti:assignee="${dwf_assignee.properties.userName}" activiti:formKey="dwf:archiveTask">
       <extensionElements>
         <activiti:taskListener event="create" class="org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener">
           <activiti:field name="script">
@@ -283,7 +306,7 @@ addPermissionToUser(task.assignee, "Consumer", bpm_package,initiator.properties.
 				                        if (typeof bpm_comment != 'undefined') task.comment = bpm_comment;
 				                        execution.setVariable('archiveRejected','false');
 		                    			execution.setVariable('approveRejected','false');
-							execution.setVariable('bpm_assignee','');
+							execution.setVariable('dwf_assignee','');
 							execution.setVariable('dwf_assignees','');]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
@@ -299,24 +322,37 @@ addPermissionToUser(task.assignee, "Consumer", bpm_package,initiator.properties.
         <activiti:taskListener event="complete" class="org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener">
           <activiti:field name="script">
             <activiti:string><![CDATA[<import resource="classpath:alfresco/extension/workflow/throwCustomErrors.js">
-            		if(execution.getVariable('dwf_taskType')== 'Select_Option'){
+            		if(task.getVariableLocal('dwf_taskType')== 'Select_Option'){
 	            		illegalDataErrors(1);
 	            	}
+	            	if((task.getVariableLocal('dwf_assignee')== '' || task.getVariableLocal('dwf_assignee')== 'undefined' || task.getVariableLocal('dwf_assignee')== null || task.getVariableLocal('dwf_assignee')== undefined) && (execution.getVariable('dwf_taskType')!= 'Finished' || task.getVariableLocal('dwf_archiveOutcome') != 'Reject')){
+	            		illegalDataErrors(2);
+	            	}
 	            	if(task.getVariableLocal('dwf_archiveOutcome') == 'Archive'){
-			            	execution.setVariable('bpm_assignee', task.getVariableLocal('bpm_assignee'));
+			            	execution.setVariable('dwf_assignee', task.getVariableLocal('dwf_assignee'));
 			            	execution.setVariable('typeTask',task.getVariableLocal('dwf_taskType'));
 				       		execution.setVariable('finished', 'false');
-				       		if(task.getVariableLocal('dwf_assignees')!= 'undefined' && task.getVariableLocal('dwf_assignees')!= '')
+				       		if(task.getVariableLocal('dwf_assignees')!= 'undefined' && task.getVariableLocal('dwf_assignees')!= '' && task.getVariableLocal('dwf_assignees')!= null && task.getVariableLocal('dwf_assignees')!= undefined){
 	            				execution.setVariable('dwf_assistAssignees',task.getVariableLocal('dwf_assignees'));
-	            			else execution.setVariable('dwf_assistAssignees','');	
+	            				execution.setVariable('assistFlow','true');
+	            			}
+	            			else {
+	            				execution.setVariable('dwf_assistAssignees','');
+	            				execution.setVariable('assistFlow','false');
+	            			}	
 	            			execution.setVariable('returnApprove','false');
 		          		}
 		          		else if(task.getVariableLocal('dwf_archiveOutcome') == 'Reject'){
 		          			execution.setVariable('finished', 'false');
 				       		execution.setVariable('archiveRejected', 'true');
-				       		if(task.getVariableLocal('dwf_assignees')!= 'undefined' && task.getVariableLocal('dwf_assignees')!= '')
+				       		if(task.getVariableLocal('dwf_assignees')!= 'undefined' && task.getVariableLocal('dwf_assignees')!= '' && task.getVariableLocal('dwf_assignees')!= null && task.getVariableLocal('dwf_assignees')!= undefined){
 	            				execution.setVariable('dwf_assistAssignees',task.getVariableLocal('dwf_assignees'));
-	            			else execution.setVariable('dwf_assistAssignees','');	
+	            				execution.setVariable('assistFlow','true');
+	            			}
+	            			else {
+	            				execution.setVariable('dwf_assistAssignees','');
+	            				execution.setVariable('assistFlow','false');
+	            			}
 	            			execution.setVariable('returnApprove','false');
 		          		}
 		          		if(task.getVariableLocal('dwf_taskType')=='Finished'){
@@ -328,7 +364,7 @@ addPermissionToUser(task.assignee, "Consumer", bpm_package,initiator.properties.
         </activiti:taskListener>
       </extensionElements>
     </userTask>
-    <userTask id="usertask2" name="Assist" activiti:assignee="${assignee.properties.userName}" activiti:formKey="dwf:assistTask">
+    <userTask id="usertask2" name="Control" activiti:assignee="${assignee.properties.userName}" activiti:formKey="dwf:assistTask">
       <extensionElements>
         <activiti:taskListener event="assignment" class="org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener">
           <activiti:field name="script">
@@ -345,44 +381,12 @@ addPermissionToUser(task.assignee, "Consumer", bpm_package,initiator.properties.
     <sequenceFlow id="flow33" sourceRef="usertask2" targetRef="endevent4"></sequenceFlow>
     <sequenceFlow id="flow35" sourceRef="start" targetRef="parallelgateway2"></sequenceFlow>
     <sequenceFlow id="flow36" sourceRef="exclusivegateway1" targetRef="usertask2">
-      <extensionElements>
-        <activiti:executionListener event="take" class="org.alfresco.repo.workflow.activiti.listener.ScriptExecutionListener">
-          <activiti:field name="script">
-            <activiti:string><![CDATA[logger.log("\n\n\n CONTROL");]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-      </extensionElements>
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('dwf_assistAssignees')!='' && execution.getVariable('dwf_assistAssignees')!='undefined' && execution.getVariable('dwf_assistAssignees')!='undefined' && execution.getVariable('dwf_assistAssignees')!='null' && (typeof execution.getVariable('dwf_assistAssignees') != null)}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('assistFlow') == 'true'}]]></conditionExpression>
     </sequenceFlow>
-    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway">
-      <extensionElements>
-        <activiti:executionListener event="start" class="org.alfresco.repo.workflow.activiti.listener.ScriptExecutionListener">
-          <activiti:field name="script">
-            <activiti:string><![CDATA[logger.log("\n\n\n IN GATEWAY");
-
-logger.log(execution.getVariable('dwf_assistAssignees'));]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-      </extensionElements>
-    </exclusiveGateway>
-    <sequenceFlow id="flow37" sourceRef="parallelgateway2" targetRef="exclusivegateway1">
-      <extensionElements>
-        <activiti:executionListener event="take" class="org.alfresco.repo.workflow.activiti.listener.ScriptExecutionListener">
-          <activiti:field name="script">
-            <activiti:string><![CDATA[logger.log("\n\n\nIN ASSIST FLOW");]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-      </extensionElements>
-    </sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow37" sourceRef="parallelgateway2" targetRef="exclusivegateway1"></sequenceFlow>
     <sequenceFlow id="flow38" sourceRef="exclusivegateway1" targetRef="endevent4">
-      <extensionElements>
-        <activiti:executionListener event="take" class="org.alfresco.repo.workflow.activiti.listener.ScriptExecutionListener">
-          <activiti:field name="script">
-            <activiti:string><![CDATA[logger.log("\n\n NO CONTROL");]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
-      </extensionElements>
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('dwf_assistAssignees')=='' || execution.getVariable('dwf_assistAssignees')=='undefined' || execution.getVariable('dwf_assistAssignees')=='undefined' || execution.getVariable('dwf_assistAssignees')=='null' || (typeof execution.getVariable('dwf_assistAssignees') == null)}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('assistFlow') == 'false'}]]></conditionExpression>
     </sequenceFlow>
     <parallelGateway id="parallelgateway2" name="Parallel Gateway"></parallelGateway>
     <exclusiveGateway id="gate2" name="GATE 2"></exclusiveGateway>

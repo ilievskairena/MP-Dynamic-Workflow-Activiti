@@ -7,7 +7,7 @@
 				<field-visibility>
 					<show id="bpm:workflowDescription" />
 					<show id="bpm:workflowDueDate" />
-					<show id="bpm:assignee" />
+					<show id="dwf:assignee" />
 					<show id="dwf:assignees" />
 					<show id="dwf:description" />
 					<show id="packageItems" />
@@ -27,7 +27,7 @@
 						</control>
 					</field>
 					<field id="bpm:workflowDueDate" label-id="alvex.workflow.task-due-date" set="task-info" />
-					<field id="bpm:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
+					<field id="dwf:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
 						<control template="/orgchart-picker.ftl" />
 					</field>
 					<field id="dwf:assignees" label-id="alvex.workflow.bpm_assignees" set="task-info">
@@ -60,7 +60,7 @@
 				<field-visibility>
 					<show id="bpm:workflowDescription" />
 					<show id="bpm:workflowDueDate" />
-					<show id="bpm:assignee" />
+					<show id="dwf:assignee" />
 					<show id="dwf:assignees" />
 					<show id="dwf:description" />
 					<show id="packageItems" />
@@ -76,7 +76,7 @@
 						</control>
 					</field>
 					<field id="bpm:workflowDueDate" label-id="alvex.workflow.task-due-date" set="task-info" />
-					<field id="bpm:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
+					<field id="dwf:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
 						<control template="/orgchart-picker.ftl" />
 					</field>
 					<field id="dwf:assignees" label-id="alvex.workflow.bpm_assignees" set="task-info">
@@ -106,7 +106,7 @@
 				<field-visibility>
 					<show id="bpm:workflowDescription" />
 					<show id="bpm:workflowDueDate" />
-					<show id="bpm:assignee" />
+					<show id="dwf:assignee" />
 					<show id="dwf:assignees" />
 					<show id="dwf:description" />
 					<show id="packageItems" />
@@ -127,7 +127,7 @@
 						</control>
 					</field>
 					<field id="bpm:workflowDueDate" label-id="alvex.workflow.task-due-date" set="task-info" />
-					<field id="bpm:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
+					<field id="dwf:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
 						<control template="/orgchart-picker.ftl" />
 					</field>
 					<field id="dwf:assignees" label-id="alvex.workflow.bpm_assignees" set="task-info">
@@ -192,7 +192,7 @@
 				<field-visibility>
 					<show id="bpm:workflowDescription" />
 					<show id="bpm:workflowDueDate" />
-					<show id="bpm:assignee" />
+					<show id="dwf:assignee" />
 					<show id="dwf:assignees" />
 					<show id="dwf:description" />
 					<show id="packageItems" />
@@ -213,7 +213,7 @@
 						</control>
 					</field>
 					<field id="bpm:workflowDueDate" label-id="alvex.workflow.task-due-date" set="task-info" />
-					<field id="bpm:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
+					<field id="dwf:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
 						<control template="/orgchart-picker.ftl" />
 					</field>
 					<field id="dwf:assignees" label-id="alvex.workflow.bpm_assignees" set="task-info">
@@ -247,7 +247,7 @@
 				<field-visibility>
 					<show id="bpm:workflowDescription" />
 					<show id="bpm:workflowDueDate" />
-					<show id="bpm:assignee" />
+					<show id="dwf:assignee" />
 					<show id="dwf:assignees" />
 					<show id="dwf:description" />
 					<show id="packageItems" />
@@ -268,7 +268,7 @@
 						</control>
 					</field>
 					<field id="bpm:workflowDueDate" label-id="alvex.workflow.task-due-date" set="task-info" />
-					<field id="bpm:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
+					<field id="dwf:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
 						<control template="/orgchart-picker.ftl" />
 					</field>
 					<field id="dwf:assignees" label-id="alvex.workflow.bpm_assignees" set="task-info">
@@ -368,7 +368,7 @@
 						</control>
 					</field>
 					<field id="bpm:workflowDueDate" label-id="alvex.workflow.task-due-date" set="task-info" />
-					<field id="bpm:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
+					<field id="dwf:assignee" label-id="alvex.workflow.bpm_assignee" set="task-info">
 						<control template="/orgchart-picker.ftl" />
 					</field>
 					<field id="packageItems" label-id="alvex.workflow.related-documents" set="documents">
@@ -383,5 +383,35 @@
 		</forms>
 	</config>
 	
+	<config evaluator="task-type" condition="dwf:submitTask">
+      <forms>
+         <form>
+            <field-visibility>
+               <show id="bpm:workflowDescription" />
+               <show id="dwf:assignee" />
+               <show id="dwf:assignees" />
+               <show id="packageItems" />
+               <show id="dwf:taskDetails" />
+               <show id="dwf:taskType" />
+            </field-visibility>
+            <appearance>
+               <set id="" appearance="title" label-id="workflow.set.general" />
+               <set id="documents" appearance="title" label-id="workflow.set.items" />
+ 			   <set id="people" appearance="title" label-id="workflow.set.dynamic.task.people" />               
+               <set id="details" appearance="title" label-id="workflow.set.dynamic.task.details" />
+               
+               <field id="bpm:workflowDescription" label-id="workflow.field.message">
+                  <control template="/org/alfresco/components/form/controls/info.ftl">
+                  </control>
+               </field>
+               <field id="packageItems" set="documents" />
+               <field id="dwf:assignee" set="people" label-id="label.dynamic.task.bpm_assignee"/>
+               <field id="dwf:assignees" set="people" label-id="label.dynamic.task.dwf_assignees"/>
+               <field id="dwf:taskDetails" set="details" label-id="label.dynamic.task.dwf_taskDetails"/>    
+               <field id="dwf:taskType" set="details" label-id="label.dynamic.task.dwf_taskType"/>          
+            </appearance>
+         </form>
+      </forms>
+    </config>
 	
 </alfresco-config>

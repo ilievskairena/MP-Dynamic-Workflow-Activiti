@@ -17,6 +17,7 @@
 		<property name="labels">
 			<list>
 				<value>alfresco.module.${project.artifactId}.messages.alvex-custom-workflows</value>
+				<value>alfresco.module.${project.artifactId}.messages.dynWf</value>
 			</list>
 		</property>
 		<property name="models">
